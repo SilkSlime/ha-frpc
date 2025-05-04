@@ -5,7 +5,7 @@ CONFIG_PATH="/share/frpc.toml"
 mkdir -p /share
 bashio::log.info "▶ Generating FRPC config"
 
-bashio::log.info "▶ 1"
+# [common]
 cat <<EOF >"$CONFIG_PATH"
 [common]
 serverAddr  = "$(bashio::config 'serverAddr')"
@@ -17,7 +17,7 @@ log.level   = "info"
 log.maxDays = 3
 EOF
 
-bashio::log.info "▶ 2"
+# TLS
 if bashio::config.true 'tlsEnable'; then
   cat <<EOF >>"$CONFIG_PATH"
 tls.enable        = true
@@ -27,12 +27,11 @@ tls.trustedCaFile = "$(bashio::config 'tlsCaFile')"
 EOF
 fi
 
-bashio::log.info "▶ 3"
+# user proxies
 bashio::log.info "▶ Appending user proxies"
 echo "" >>"$CONFIG_PATH"
-bashio::log.info "▶ 4"
 bashio::config 'frpcConfig' >>"$CONFIG_PATH"
 
-bashio::log.info "▶ 5"
+# Replace shell with FRPC so FRPC is PID 1 (no s6-overlay error)
 bashio::log.info "▶ Starting FRPC client"
 /usr/src/frpc -c "$CONFIG_PATH"
