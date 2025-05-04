@@ -5,10 +5,9 @@ description: "Universal FRP client (HTTP & TCP) with TLS for Home Assistant"
 startup: "services"
 boot:    "auto"
 
-# Изоляция и маунты
 host_network: false
 map:
-  ssl: /ssl:ro     # подтягиваем сертификаты HA
+  ssl: /ssl:ro
 
 arch:
   - aarch64
@@ -17,100 +16,48 @@ arch:
   - armhf
   - i386
 
+# Только дефолты для опций — без description и enum/default
 options:
-  # --- Основные параметры ---
+  serverAddr: "vps.example.com"
+  serverPort: 7000
+  authMethod: "token"
+  authToken: ""
+  tlsEnable: true
+  tlsCertFile: "/ssl/fullchain.pem"
+  tlsKeyFile: "/ssl/privkey.pem"
+  tlsCaFile: "/ssl/fullchain.pem"
+  frpcConfig: |
+
+    # Ваши [[proxies]]-блоки здесь…
+
+# Описание, типы и ограничения в schema
+schema:
   serverAddr:
     description: "IP или домен вашего FRPS (VPS)"
-    type: string
-    default: "vps.example.com"
+    type: str
   serverPort:
     description: "Порт FRPS для TCP-соединений"
-    type: integer
-    default: 7000
-
+    type: int
   authMethod:
     description: "Метод аутентификации"
-    type: string
-    default: "token"
-    enum: ["token","insecure"]
+    type: match(token|insecure)
   authToken:
     description: "Секретный токен (если token-auth)"
-    type: string
-    default: ""
-
-  # --- TLS для FRP канала ---
+    type: password
   tlsEnable:
     description: "Шифровать канал FRP (TLS)"
-    type: boolean
-    default: true
+    type: bool
   tlsCertFile:
     description: "Путь к клиентскому сертификату"
-    type: string
-    default: "/ssl/fullchain.pem"
+    type: str
   tlsKeyFile:
     description: "Путь к клиентскому ключу"
-    type: string
-    default: "/ssl/privkey.pem"
+    type: str
   tlsCaFile:
     description: "Путь к доверенному CA (обычно fullchain)"
-    type: string
-    default: "/ssl/fullchain.pem"
-
-  # --- Ваши прокси-блоки (HTTP/TCP) ---
+    type: str
   frpcConfig:
     description: |
       Опишите здесь ваши [[proxies]]-блоки в TOML формате.
-      Например, HTTP-прокси для HA и TCP-туннели:
-    type: string
-    default: |
-      # HTTP-прокси Home Assistant
-      [[proxies]]
-      name = "homeassistant"
-      type = "http"
-      localIP = "127.0.0.1"
-      localPort = 8123
-      customDomains = ["home.silkslime.ru"]
-      transport.useEncryption = true
-      transport.useCompression = true
-
-      # TCP-туннели
-      [[proxies]]
-      name = "open-webui"
-      type = "tcp"
-      localIP = "open-webui"
-      localPort = 8080
-      remotePort = 8080
-
-      [[proxies]]
-      name = "ollama"
-      type = "tcp"
-      localIP = "ollama"
-      localPort = 11434
-      remotePort = 11434
-
-      [[proxies]]
-      name = "automatic1111"
-      type = "tcp"
-      localIP = "automatic1111"
-      localPort = 7860
-      remotePort = 7860
-
-schema:
-  serverAddr:
-    type: str
-  serverPort:
-    type: int
-  authMethod:
-    type: match(token|insecure)
-  authToken:
-    type: str
-  tlsEnable:
-    type: bool
-  tlsCertFile:
-    type: str
-  tlsKeyFile:
-    type: str
-  tlsCaFile:
-    type: str
-  frpcConfig:
+      Например, HTTP-прокси для HA и TCP-туннели.
     type: str
