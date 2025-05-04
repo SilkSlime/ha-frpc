@@ -101,8 +101,7 @@ schema:
   serverPort:
     type: int
   authMethod:
-    type: str
-    enum: ["token","insecure"]
+    type: match(token|insecure)
   authToken:
     type: str
   tlsEnable:
