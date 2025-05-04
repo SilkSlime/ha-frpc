@@ -1,5 +1,5 @@
 name: "FRP Client"
-version: "0.2.0"
+version: "0.2.1"
 slug: "frp_client"
 description: "Reverse-proxy FRP client for Home Assistant using frpc"
 startup: services
@@ -34,8 +34,8 @@ options:
       type: "http"
       localIP: "127.0.0.1"
       localPort: 8123
-      customDomains:
-        - "home.example.com"
+      remotePort: 8123
+      customDomains: "home.example.com"
       useEncryption: true
       useCompression: true
 
@@ -48,4 +48,12 @@ schema:
   tlsCertFile: str
   tlsKeyFile: str
   tlsCaFile: str
-  proxies: list(map(name=str,type=match(http|tcp|udp),localIP=str,localPort=port,remotePort=port?,customDomains=list(str)?,useEncryption=bool,useCompression=bool))
+  proxies:
+    - name: str
+      type: match(http|tcp|udp)
+      localIP: str
+      localPort: port
+      remotePort: port
+      customDomains: str
+      useEncryption: bool
+      useCompression: bool

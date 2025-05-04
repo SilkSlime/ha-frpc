@@ -36,7 +36,8 @@ for i in $(bashio::config 'proxies|keys'); do
   type=$(bashio::config "proxies[${i}].type")
   localIP=$(bashio::config "proxies[${i}].localIP")
   localPort=$(bashio::config "proxies[${i}].localPort")
-  remotePort=$(bashio::config "proxies[${i}].remotePort" || echo "")
+  remotePort=$(bashio::config "proxies[${i}].remotePort")
+  customDomains=$(bashio::config "proxies[${i}].customDomains")
   useEnc=$(bashio::config "proxies[${i}].useEncryption")
   useComp=$(bashio::config "proxies[${i}].useCompression")
 
@@ -45,21 +46,10 @@ for i in $(bashio::config 'proxies|keys'); do
   echo "type = \"$type\"" >>"$CONFIG_PATH"
   echo "localIP = \"$localIP\"" >>"$CONFIG_PATH"
   echo "localPort = $localPort" >>"$CONFIG_PATH"
+  echo "remotePort = $remotePort" >>"$CONFIG_PATH"
 
-  if [ -n "$remotePort" ]; then
-    echo "remotePort = $remotePort" >>"$CONFIG_PATH"
-  fi
-
-  # customDomains (optional)
   if bashio::config.has_value "proxies[${i}].customDomains"; then
-    echo -n "customDomains = [" >>"$CONFIG_PATH"
-    first=1
-    for domain in $(bashio::config "proxies[${i}].customDomains"); do
-      [ "$first" -eq 0 ] && echo -n ", " >>"$CONFIG_PATH"
-      echo -n "\"$domain\"" >>"$CONFIG_PATH"
-      first=0
-    done
-    echo "]" >>"$CONFIG_PATH"
+    echo "customDomains = [\"$customDomains\"]" >>"$CONFIG_PATH"
   fi
 
   echo "transport.useEncryption = $useEnc" >>"$CONFIG_PATH"
