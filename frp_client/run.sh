@@ -15,72 +15,78 @@ fi
 bashio::log.info "▶ Dumping options.json:"
 cat "$OPTIONS_PATH"
 
-# === DEBUG: print key fields
+# === Читаем параметры в переменные
+SERVER_ADDR=$(bashio::config 'serverAddr')
+SERVER_PORT=$(bashio::config 'serverPort')
+AUTH_METHOD=$(bashio::config 'authMethod')
+AUTH_TOKEN=$(bashio::config 'authToken')
+TLS_ENABLE=$(bashio::config 'tlsEnable')
+TLS_CERT=$(bashio::config 'tlsCertFile')
+TLS_KEY=$(bashio::config 'tlsKeyFile')
+TLS_CA=$(bashio::config 'tlsCaFile')
+
 bashio::log.info "▶ Parsed values:"
-bashio::log.info "serverAddr  = $(bashio::config 'serverAddr')"
-bashio::log.info "serverPort  = $(bashio::config 'serverPort')"
-bashio::log.info "authMethod  = $(bashio::config 'authMethod')"
-bashio::log.info "authToken   = $(bashio::config 'authToken')"
-bashio::log.info "tlsEnable   = $(bashio::config 'tlsEnable')"
-bashio::log.info "proxies     = $(bashio::config 'proxies')"
+bashio::log.info "serverAddr  = $SERVER_ADDR"
+bashio::log.info "serverPort  = $SERVER_PORT"
+bashio::log.info "authMethod  = $AUTH_METHOD"
+bashio::log.info "authToken   = $AUTH_TOKEN"
+bashio::log.info "tlsEnable   = $TLS_ENABLE"
 
-bashio::log.info "▶ Generating FRPC config"
-
-# === [common] section
+# === [common]
 cat <<EOF >"$CONFIG_PATH"
 [common]
-serverAddr  = "$(bashio::config 'serverAddr')"
-serverPort  = $(bashio::config 'serverPort')
-auth.method = "$(bashio::config 'authMethod')"
-auth.token  = "$(bashio::config 'authToken')"
+serverAddr  = "$SERVER_ADDR"
+serverPort  = $SERVER_PORT
+auth.method = "$AUTH_METHOD"
+auth.token  = "$AUTH_TOKEN"
 log.to      = "/share/frpc.log"
 log.level   = "info"
 log.maxDays = 3
 EOF
 
-# === TLS section
-if bashio::config.true 'tlsEnable'; then
+# === TLS
+if [ "$TLS_ENABLE" = "true" ]; then
   cat <<EOF >>"$CONFIG_PATH"
 tls.enable        = true
-tls.certFile      = "$(bashio::config 'tlsCertFile')"
-tls.keyFile       = "$(bashio::config 'tlsKeyFile')"
-tls.trustedCaFile = "$(bashio::config 'tlsCaFile')"
+tls.certFile      = "$TLS_CERT"
+tls.keyFile       = "$TLS_KEY"
+tls.trustedCaFile = "$TLS_CA"
 EOF
 fi
 
-# === proxies section
+# === Proxies
 bashio::log.info "▶ Appending proxies"
 if bashio::config.has_value 'proxies'; then
   for i in $(bashio::config 'proxies|keys'); do
-    name=$(bashio::config "proxies[${i}].name")
-    type=$(bashio::config "proxies[${i}].type")
-    localIP=$(bashio::config "proxies[${i}].localIP")
-    localPort=$(bashio::config "proxies[${i}].localPort")
-    remotePort=$(bashio::config "proxies[${i}].remotePort")
-    useEnc=$(bashio::config "proxies[${i}].useEncryption")
-    useComp=$(bashio::config "proxies[${i}].useCompression")
+    NAME=$(bashio::config "proxies[${i}].name")
+    TYPE=$(bashio::config "proxies[${i}].type")
+    LOCAL_IP=$(bashio::config "proxies[${i}].localIP")
+    LOCAL_PORT=$(bashio::config "proxies[${i}].localPort")
+    REMOTE_PORT=$(bashio::config "proxies[${i}].remotePort")
+    ENC=$(bashio::config "proxies[${i}].useEncryption")
+    COMP=$(bashio::config "proxies[${i}].useCompression")
 
     echo -e "\n[[proxies]]" >>"$CONFIG_PATH"
-    echo "name = \"$name\"" >>"$CONFIG_PATH"
-    echo "type = \"$type\"" >>"$CONFIG_PATH"
-    echo "localIP = \"$localIP\"" >>"$CONFIG_PATH"
-    echo "localPort = $localPort" >>"$CONFIG_PATH"
-    echo "remotePort = $remotePort" >>"$CONFIG_PATH"
+    echo "name = \"$NAME\"" >>"$CONFIG_PATH"
+    echo "type = \"$TYPE\"" >>"$CONFIG_PATH"
+    echo "localIP = \"$LOCAL_IP\"" >>"$CONFIG_PATH"
+    echo "localPort = $LOCAL_PORT" >>"$CONFIG_PATH"
+    echo "remotePort = $REMOTE_PORT" >>"$CONFIG_PATH"
 
-    # Convert list of strings to TOML array
+    # customDomains
     if bashio::config.has_value "proxies[${i}].customDomains"; then
-      domains=$(bashio::config "proxies[${i}].customDomains" | jq -r '. | map("\""+.+"\"") | join(", ")')
-      echo "customDomains = [${domains}]" >>"$CONFIG_PATH"
+      DOMAINS=$(bashio::config "proxies[${i}].customDomains" | jq -r '. | map("\""+.+"\"") | join(", ")')
+      echo "customDomains = [${DOMAINS}]" >>"$CONFIG_PATH"
     fi
 
-    echo "transport.useEncryption = $useEnc" >>"$CONFIG_PATH"
-    echo "transport.useCompression = $useComp" >>"$CONFIG_PATH"
+    echo "transport.useEncryption = $ENC" >>"$CONFIG_PATH"
+    echo "transport.useCompression = $COMP" >>"$CONFIG_PATH"
   done
 else
   bashio::log.warning "⚠️ No proxies configured — FRP will start without tunnels."
 fi
 
-# === Final output
+# === Финальный вывод и запуск
 bashio::log.info "▶ Final generated config:"
 cat "$CONFIG_PATH"
 

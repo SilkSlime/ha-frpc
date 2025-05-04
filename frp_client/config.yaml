@@ -1,5 +1,5 @@
 name: "FRP Client"
-version: "0.2.3"
+version: "0.2.4"
 slug: "frp_client"
 description: "Reverse-proxy FRP client for Home Assistant using frpc"
 startup: services
