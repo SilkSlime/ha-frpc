@@ -21,7 +21,7 @@ arch:
   - i386
 
 options:
-  serverAddr: "your-vps.example.com"
+  serverAddr: "11.22.33.44"
   serverPort: 7000
   authMethod: "token"
   authToken: "secret-token"
@@ -35,7 +35,7 @@ options:
       localIP: "127.0.0.1"
       localPort: 8123
       customDomains:
-        - "home.silkslime.ru"
+        - "home.example.com"
       useEncryption: true
       useCompression: true
 
