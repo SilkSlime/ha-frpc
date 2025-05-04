@@ -13,7 +13,7 @@ arch:
   - i386
 
 options:
-  serverAddr: ""
+  serverAddr: "server.example.com"
   serverPort: 7000
   authMethod: "insecure"
   authToken: ""
@@ -27,17 +27,17 @@ options:
     type = "http"
     localIP = "127.0.0.1"
     localPort = 8123
-    customDomains = ["home.silkslime.ru"]
+    customDomains = ["server.example.ru"]
     transport.useEncryption   = true
     transport.useCompression  = true
 
 schema:
-  serverAddr: { type: str }
-  serverPort: { type: int }
-  authMethod: { type: match(insecure|token) }
-  authToken: { type: password }
-  tlsEnable: { type: bool }
-  tlsCertFile: { type: str }
-  tlsKeyFile: { type: str }
-  tlsCaFile: { type: str }
-  frpcConfig: { type: str }
+  serverAddr: str
+  serverPort: int
+  authMethod: match(insecure|token)
+  authToken: password
+  tlsEnable: bool
+  tlsCertFile: str
+  tlsKeyFile: str
+  tlsCaFile: str
+  frpcConfig: str
