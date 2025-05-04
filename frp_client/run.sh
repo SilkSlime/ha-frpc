@@ -25,13 +25,13 @@ tls.trustedCaFile = "$(bashio::config 'tlsCaFile')"
 EOF
 fi
 
-# user proxies
+# user-defined proxies
 bashio::log.info "▶ Appending [[proxies]]"
 echo "" >>"$CONFIG_PATH"
 bashio::config 'frpcConfig' >>"$CONFIG_PATH"
 
-# start client
-bashio::log.info "▶ Starting FRPC"
-trap 'bashio::log.info "⏹ Stopping FRPC"; kill 0' SIGINT SIGTERM
+# start FRPC client
+bashio::log.info "▶ Starting FRPC client"
+trap 'bashio::log.info "⏹ Stopping FRPC client"; kill 0' SIGINT SIGTERM
 /usr/src/frpc -c "$CONFIG_PATH" &
 wait
