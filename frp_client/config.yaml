@@ -1,5 +1,5 @@
 name: "FRP Client"
-version: "0.2.1"
+version: "0.2.2"
 slug: "frp_client"
 description: "Reverse-proxy FRP client for Home Assistant using frpc"
 startup: services
@@ -35,7 +35,8 @@ options:
       localIP: "127.0.0.1"
       localPort: 8123
       remotePort: 8123
-      customDomains: "home.example.com"
+      customDomains:
+        - "home.example.com"
       useEncryption: true
       useCompression: true
 
@@ -54,6 +55,7 @@ schema:
       localIP: str
       localPort: port
       remotePort: port
-      customDomains: str
+      customDomains:
+        - str
       useEncryption: bool
       useCompression: bool
