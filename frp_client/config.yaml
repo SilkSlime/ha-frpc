@@ -1,13 +1,9 @@
 name: "FRP Client"
-version: "1.1.1"
+version: "1.1.2"
 slug: "frp_client"
-description: "Universal FRP client (HTTP & TCP) with TLS for Home Assistant"
-startup: "services"
-boot:    "auto"
-
-host_network: false
-map:
-  ssl: /ssl:ro
+description: "Reverse-proxy FRP client for Home Assistant"
+startup: services
+boot: auto
 
 arch:
   - aarch64
@@ -17,63 +13,31 @@ arch:
   - i386
 
 options:
-  serverAddr:    "vps.example.com"
-  serverPort:    7000
-  authMethod:    "token"
-  authToken:     ""
-  tlsEnable:     true
-  tlsCertFile:   "/ssl/fullchain.pem"
-  tlsKeyFile:    "/ssl/privkey.pem"
-  tlsCaFile:     "/ssl/fullchain.pem"
+  serverAddr: "91.84.113.196"
+  serverPort: 7000
+  authMethod: insecure
+  authToken: ""
+  tlsEnable: true
+  tlsCertFile: "/ssl/fullchain.pem"
+  tlsKeyFile: "/ssl/privkey.pem"
+  tlsCaFile: "/ssl/fullchain.pem"
   frpcConfig: |
-    # HTTP-прокси Home Assistant
     [[proxies]]
     name = "homeassistant"
     type = "http"
     localIP = "127.0.0.1"
     localPort = 8123
     customDomains = ["home.silkslime.ru"]
-    transport.useEncryption = true
-    transport.useCompression = true
-
-    # TCP-туннели примеры:
-    [[proxies]]
-    name = "open-webui"
-    type = "tcp"
-    localIP = "open-webui"
-    localPort = 8080
-    remotePort = 8080
-
-    [[proxies]]
-    name = "ollama"
-    type = "tcp"
-    localIP = "ollama"
-    localPort = 11434
-    remotePort = 11434
-
-    [[proxies]]
-    name = "automatic1111"
-    type = "tcp"
-    localIP = "automatic1111"
-    localPort = 7860
-    remotePort = 7860
+    transport.useEncryption   = true
+    transport.useCompression  = true
 
 schema:
-  serverAddr:
-    type: str
-  serverPort:
-    type: int
-  authMethod:
-    type: match(token|insecure)
-  authToken:
-    type: password
-  tlsEnable:
-    type: bool
-  tlsCertFile:
-    type: str
-  tlsKeyFile:
-    type: str
-  tlsCaFile:
-    type: str
-  frpcConfig:
-    type: str
+  serverAddr: { type: str }
+  serverPort: { type: int }
+  authMethod: { type: match(insecure|token) }
+  authToken: { type: password }
+  tlsEnable: { type: bool }
+  tlsCertFile: { type: str }
+  tlsKeyFile: { type: str }
+  tlsCaFile: { type: str }
+  frpcConfig: { type: str }
