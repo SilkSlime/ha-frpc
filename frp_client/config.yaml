@@ -48,30 +48,4 @@ schema:
   tlsCertFile: str
   tlsKeyFile: str
   tlsCaFile: str
-  proxies:
-    type: list
-    default: []
-    elements:
-      type: map
-      required:
-        - name
-        - type
-        - localIP
-        - localPort
-      schema:
-        name: str
-        type: match(http|tcp|udp)
-        localIP: str
-        localPort: port
-        remotePort:
-          type: port
-          required: false
-        customDomains:
-          type: list(str)
-          required: false
-        useEncryption:
-          type: bool
-          default: true
-        useCompression:
-          type: bool
-          default: true
+  proxies: list(map(name=str,type=match(http|tcp|udp),localIP=str,localPort=port,remotePort=port?,customDomains=list(str)?,useEncryption=bool,useCompression=bool))
