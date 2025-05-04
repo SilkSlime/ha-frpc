@@ -1,11 +1,10 @@
 name: "FRP Client"
-version: "0.1.2"
+version: "0.2.0"
 slug: "frp_client"
-description: "Reverse-proxy FRP client for Home Assistant"
+description: "Reverse-proxy FRP client for Home Assistant using frpc"
 startup: services
 boot: auto
 init: false
-
 host_network: true
 
 map:
@@ -13,7 +12,6 @@ map:
     read_only: false
   - type: ssl
     read_only: true
-
 
 arch:
   - aarch64
@@ -23,23 +21,23 @@ arch:
   - i386
 
 options:
-  serverAddr: "server.example.com"
+  serverAddr: "your-vps.example.com"
   serverPort: 7000
-  authMethod: "insecure"
-  authToken: ""
+  authMethod: "token"
+  authToken: "secret-token"
   tlsEnable: true
   tlsCertFile: "/ssl/fullchain.pem"
   tlsKeyFile: "/ssl/privkey.pem"
   tlsCaFile: "/ssl/fullchain.pem"
-  frpcConfig: |
-    [[proxies]]
-    name = "homeassistant"
-    type = "http"
-    localIP = "127.0.0.1"
-    localPort = 8123
-    customDomains = ["server.example.com"]
-    transport.useEncryption   = true
-    transport.useCompression  = true
+  proxies:
+    - name: "homeassistant"
+      type: "http"
+      localIP: "127.0.0.1"
+      localPort: 8123
+      customDomains:
+        - "home.silkslime.ru"
+      useEncryption: true
+      useCompression: true
 
 schema:
   serverAddr: str
@@ -50,4 +48,30 @@ schema:
   tlsCertFile: str
   tlsKeyFile: str
   tlsCaFile: str
-  frpcConfig: str
+  proxies:
+    type: list
+    default: []
+    elements:
+      type: map
+      required:
+        - name
+        - type
+        - localIP
+        - localPort
+      schema:
+        name: str
+        type: match(http|tcp|udp)
+        localIP: str
+        localPort: port
+        remotePort:
+          type: port
+          required: false
+        customDomains:
+          type: list(str)
+          required: false
+        useEncryption:
+          type: bool
+          default: true
+        useCompression:
+          type: bool
+          default: true
