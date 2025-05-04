@@ -7,10 +7,10 @@ app_path="/usr/src"
 
 select_machine() {
   case "$build_arch" in
-    aarch64)     echo "arm64" ;;  
-    amd64)       echo "amd64" ;;  
-    armhf|armv7) echo "arm"  ;;  
-    i386)        echo "386"   ;;  
+    aarch64)    echo "arm64" ;;
+    amd64)      echo "amd64" ;;
+    armhf|armv7) echo "arm" ;;
+    i386)       echo "386" ;;
   esac
 }
 

@@ -10,4 +10,4 @@ COPY run.sh      /
 RUN chmod +x /bootstrap.sh /run.sh \
  && /bootstrap.sh $BUILD_ARCH $FRP_VERSION
 
-CMD [ "/run.sh" ]
+ENTRYPOINT [ "/run.sh" ]
