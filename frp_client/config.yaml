@@ -19,7 +19,7 @@ arch:
   - i386
 
 options:
-  serverAddr: "server.example.com"
+  serverAddr: "server.example.org"
   serverPort: 7000
   authMethod: "insecure"
   authToken: ""
@@ -33,7 +33,7 @@ options:
     type = "http"
     localIP = "127.0.0.1"
     localPort = 8123
-    customDomains = ["home.silkslime.ru"]
+    customDomains = ["server.example.org"]
     transport.useEncryption   = true
     transport.useCompression  = true
 
