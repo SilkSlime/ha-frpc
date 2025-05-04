@@ -7,23 +7,20 @@ OPTIONS_PATH="/data/options.json"
 mkdir -p "$(dirname "$CONFIG_PATH")"
 
 bashio::log.info "▶ Checking if options file exists..."
-if [ ! -f "$OPTIONS_PATH" ]; then
-  bashio::log.error "❌ Options file not found at $OPTIONS_PATH"
-  exit 1
-fi
+[ -f "$OPTIONS_PATH" ] || { bashio::log.error "Options not found"; exit 1; }
 
 bashio::log.info "▶ Dumping options.json:"
 cat "$OPTIONS_PATH"
 
-# === Читаем параметры в переменные
-SERVER_ADDR=$(bashio::config 'serverAddr')
-SERVER_PORT=$(bashio::config 'serverPort')
-AUTH_METHOD=$(bashio::config 'authMethod')
-AUTH_TOKEN=$(bashio::config 'authToken')
-TLS_ENABLE=$(bashio::config 'tlsEnable')
-TLS_CERT=$(bashio::config 'tlsCertFile')
-TLS_KEY=$(bashio::config 'tlsKeyFile')
-TLS_CA=$(bashio::config 'tlsCaFile')
+# === Read common settings via bashio::config
+SERVER_ADDR =$(bashio::config 'serverAddr')
+SERVER_PORT =$(bashio::config 'serverPort')
+AUTH_METHOD =$(bashio::config 'authMethod')
+AUTH_TOKEN  =$(bashio::config 'authToken')
+TLS_ENABLE   =$(bashio::config 'tlsEnable')
+TLS_CERT     =$(bashio::config 'tlsCertFile')
+TLS_KEY      =$(bashio::config 'tlsKeyFile')
+TLS_CA       =$(bashio::config 'tlsCaFile')
 
 bashio::log.info "▶ Parsed values:"
 bashio::log.info "serverAddr  = $SERVER_ADDR"
@@ -32,7 +29,7 @@ bashio::log.info "authMethod  = $AUTH_METHOD"
 bashio::log.info "authToken   = $AUTH_TOKEN"
 bashio::log.info "tlsEnable   = $TLS_ENABLE"
 
-# === [common]
+# === Generate [common]
 cat <<EOF >"$CONFIG_PATH"
 [common]
 serverAddr  = "$SERVER_ADDR"
@@ -54,39 +51,37 @@ tls.trustedCaFile = "$TLS_CA"
 EOF
 fi
 
-# === Proxies
+# === Proxies via jq ===
 bashio::log.info "▶ Appending proxies"
-if bashio::config.has_value 'proxies'; then
-  for i in $(bashio::config 'proxies|keys'); do
-    NAME=$(bashio::config "proxies[${i}].name")
-    TYPE=$(bashio::config "proxies[${i}].type")
-    LOCAL_IP=$(bashio::config "proxies[${i}].localIP")
-    LOCAL_PORT=$(bashio::config "proxies[${i}].localPort")
-    REMOTE_PORT=$(bashio::config "proxies[${i}].remotePort")
-    ENC=$(bashio::config "proxies[${i}].useEncryption")
-    COMP=$(bashio::config "proxies[${i}].useCompression")
+if jq -e '.proxies | length>0' "$OPTIONS_PATH" >/dev/null; then
+  jq -c '.proxies[]' "$OPTIONS_PATH" | while read -r proxy; do
+    NAME      =$(echo "$proxy" | jq -r '.name')
+    TYPE      =$(echo "$proxy" | jq -r '.type')
+    LOCAL_IP  =$(echo "$proxy" | jq -r '.localIP')
+    LOCAL_PORT =$(echo "$proxy" | jq -r '.localPort')
+    REMOTE_PORT=$(echo "$proxy" | jq -r '.remotePort')
+    DOMAINS   =$(echo "$proxy" | jq -r '.customDomains | map("\""+.+"\"") | join(", ")')
+    USE_ENC   =$(echo "$proxy" | jq -r '.useEncryption')
+    USE_COMP  =$(echo "$proxy" | jq -r '.useCompression')
 
-    echo -e "\n[[proxies]]" >>"$CONFIG_PATH"
-    echo "name = \"$NAME\"" >>"$CONFIG_PATH"
-    echo "type = \"$TYPE\"" >>"$CONFIG_PATH"
-    echo "localIP = \"$LOCAL_IP\"" >>"$CONFIG_PATH"
-    echo "localPort = $LOCAL_PORT" >>"$CONFIG_PATH"
-    echo "remotePort = $REMOTE_PORT" >>"$CONFIG_PATH"
+    cat <<EOF >>"$CONFIG_PATH"
 
-    # customDomains
-    if bashio::config.has_value "proxies[${i}].customDomains"; then
-      DOMAINS=$(bashio::config "proxies[${i}].customDomains" | jq -r '. | map("\""+.+"\"") | join(", ")')
-      echo "customDomains = [${DOMAINS}]" >>"$CONFIG_PATH"
-    fi
-
-    echo "transport.useEncryption = $ENC" >>"$CONFIG_PATH"
-    echo "transport.useCompression = $COMP" >>"$CONFIG_PATH"
+[[proxies]]
+name                 = "$NAME"
+type                 = "$TYPE"
+localIP              = "$LOCAL_IP"
+localPort            = $LOCAL_PORT
+remotePort           = $REMOTE_PORT
+customDomains        = [${DOMAINS}]
+transport.useEncryption   = $USE_ENC
+transport.useCompression  = $USE_COMP
+EOF
   done
 else
-  bashio::log.warning "⚠️ No proxies configured — FRP will start without tunnels."
+  bashio::log.warning "⚠️ No proxies configured."
 fi
 
-# === Финальный вывод и запуск
+# === Show final config & start
 bashio::log.info "▶ Final generated config:"
 cat "$CONFIG_PATH"
 
