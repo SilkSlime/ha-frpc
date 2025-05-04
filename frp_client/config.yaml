@@ -96,12 +96,22 @@ options:
       remotePort = 7860
 
 schema:
-  serverAddr:   { type: "string" }
-  serverPort:   { type: "integer" }
-  authMethod:   { type: "string" }
-  authToken:    { type: "string" }
-  tlsEnable:    { type: "boolean" }
-  tlsCertFile:  { type: "string" }
-  tlsKeyFile:   { type: "string" }
-  tlsCaFile:    { type: "string" }
-  frpcConfig:   { type: "string" }
+  serverAddr:
+    type: str
+  serverPort:
+    type: int
+  authMethod:
+    type: str
+    enum: ["token","insecure"]
+  authToken:
+    type: str
+  tlsEnable:
+    type: bool
+  tlsCertFile:
+    type: str
+  tlsKeyFile:
+    type: str
+  tlsCaFile:
+    type: str
+  frpcConfig:
+    type: str
