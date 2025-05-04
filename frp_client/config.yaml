@@ -7,6 +7,10 @@ boot: auto
 
 host_network: true
 
+map:
+  - share:rw
+  - ssl:ro
+
 arch:
   - aarch64
   - amd64
@@ -15,32 +19,31 @@ arch:
   - i386
 
 options:
-  serverAddr: ""            # заполните вашим VPS / FRPS адресом
-  serverPort: 7000          # порт FRPS (TCP)
-  authMethod: "token"       # или "insecure"
-  authToken: ""             # токен, если authMethod = token
-  tlsEnable: true           # шифровать канал FRP
+  serverAddr: "server.example.com"
+  serverPort: 7000
+  authMethod: "insecure"
+  authToken: ""
+  tlsEnable: true
   tlsCertFile: "/ssl/fullchain.pem"
-  tlsKeyFile:  "/ssl/privkey.pem"
-  tlsCaFile:   "/ssl/fullchain.pem"
+  tlsKeyFile: "/ssl/privkey.pem"
+  tlsCaFile: "/ssl/fullchain.pem"
   frpcConfig: |
-    # Прокси только для Home Assistant
     [[proxies]]
-    name                 = "homeassistant"
-    type                 = "http"
-    localIP              = "127.0.0.1"
-    localPort            = 8123
-    customDomains        = ["home.silkslime.ru"]
+    name = "homeassistant"
+    type = "http"
+    localIP = "127.0.0.1"
+    localPort = 8123
+    customDomains = ["home.silkslime.ru"]
     transport.useEncryption   = true
     transport.useCompression  = true
 
 schema:
-  serverAddr:    str
-  serverPort:    int
-  authMethod:    match(token|insecure)
-  authToken:     password
-  tlsEnable:     bool
-  tlsCertFile:   str
-  tlsKeyFile:    str
-  tlsCaFile:     str
-  frpcConfig:    str
+  serverAddr: str
+  serverPort: int
+  authMethod: match(insecure|token)
+  authToken: password
+  tlsEnable: bool
+  tlsCertFile: str
+  tlsKeyFile: str
+  tlsCaFile: str
+  frpcConfig: str
