@@ -8,8 +8,11 @@ boot: auto
 host_network: true
 
 map:
-  - share:rw
-  - ssl:ro
+  - type: share
+    read_only: false
+  - type: ssl
+    read_only: true
+
 
 arch:
   - aarch64
