@@ -4,6 +4,7 @@ slug: "frp_client"
 description: "Reverse-proxy FRP client for Home Assistant"
 startup: services
 boot: auto
+init: false
 
 host_network: true
 
@@ -22,7 +23,7 @@ arch:
   - i386
 
 options:
-  serverAddr: "server.example.org"
+  serverAddr: "server.example.com"
   serverPort: 7000
   authMethod: "insecure"
   authToken: ""
@@ -36,7 +37,7 @@ options:
     type = "http"
     localIP = "127.0.0.1"
     localPort = 8123
-    customDomains = ["server.example.org"]
+    customDomains = ["server.example.com"]
     transport.useEncryption   = true
     transport.useCompression  = true
 
