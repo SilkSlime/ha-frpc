@@ -28,9 +28,6 @@ options:
   proxyType: "tcp"
   localPort: 8123
   remotePort: 8123
-  customDomain: "example.com"
-  useEncryption: true
-  useCompression: true
 schema:
   serverAddr: str
   serverPort: int
@@ -38,6 +35,3 @@ schema:
   proxyType: str
   localPort: port
   remotePort: port
-  customDomain: str
-  useEncryption: bool
-  useCompression: bool

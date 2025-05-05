@@ -17,9 +17,6 @@ sed -i "s/name = \"your_proxy_name\"/name = \"$(bashio::config 'proxyName')\"/" 
 sed -i "s/type = \"tcp\"/type = \"$(bashio::config 'proxyType')\"/" $CONFIG_PATH
 sed -i "s/localPort = 8123/localPort = $(bashio::config 'localPort')/" $CONFIG_PATH
 sed -i "s/remotePort = 8123/remotePort = $(bashio::config 'remotePort')/" $CONFIG_PATH
-sed -i "s/customDomains = \[\"your_domain\"\]/customDomains = [\"$(bashio::config 'customDomain')\"]/" $CONFIG_PATH
-sed -i "s/transport.useEncryption = true/transport.useEncryption = $(bashio::config 'useEncryption')/" $CONFIG_PATH
-sed -i "s/transport.useCompression = true/transport.useCompression = $(bashio::config 'useCompression')/" $CONFIG_PATH
 
 
 bashio::log.info "Starting frp client"

@@ -9,9 +9,6 @@ log.maxDays = 3
 [[proxies]]
 name = "your_proxy_name"
 type = "tcp"
-localIP = "0.0.0.0"
+localIP = "127.0.0.1"
 localPort = 8123
 remotePort = 8123
-customDomains = ["your_domain"]
-transport.useEncryption = true
-transport.useCompression = true
