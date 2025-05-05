@@ -17,6 +17,9 @@ RUN apk add --no-cache curl tar \
     && curl -sSL "https://github.com/fatedier/frp/releases/download/v${FRP_VERSION}/frp_${FRP_VERSION}_linux_${machine}.tar.gz" \
        | tar xz --strip-components=1 -C /usr/bin frp_${FRP_VERSION}_linux_${machine}/frpc
 
+# Copy default configuration template
+COPY defaults/ /defaults/
+
 # Copy run script
 COPY run.sh /run.sh
 RUN chmod a+x /run.sh
