@@ -1,0 +1,24 @@
+serverAddr = "__SERVERADDR__"
+serverPort = __SERVERPORT__
+auth.method = "__AUTHMETHOD__"
+__AUTHTOKEN_LINE__
+
+tlsEnable = __TLSENABLE__
+__TLSCERT_LINE__
+__TLSKEY_LINE__
+__TLSCA_LINE__
+
+auth.token = "__AUTHTOKEN__"
+log.to = "/share/frpc.log"
+log.level = "info"
+log.maxDays = 3
+
+[[proxies]]
+name = "__NAME__"
+type = "__TYPE__"
+localIP = "__LOCALIP__"
+localPort = __LOCALPORT__
+remotePort = __REMOTEPORT__
+customDomains = [__CUSTOMDOMAINS__]
+transport.useEncryption = __USEENCRYPTION__
+transport.useCompression = __USECOMPRESSION__

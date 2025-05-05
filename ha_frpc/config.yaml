@@ -1,17 +1,9 @@
 name: "FRP Client"
-version: "0.2.8"
-slug: "frp_client"
-description: "Reverse-proxy FRP client for Home Assistant using frpc"
-startup: services
-boot: auto
-init: false
-host_network: true
+version: "1.0.0"
+slug: ha_frpc
 
-map:
-  - type: share
-    read_only: false
-  - type: ssl
-    read_only: true
+description: >-
+  Securely expose your Home Assistant over the internet via FRP (Fast Reverse Proxy).
 
 arch:
   - aarch64
@@ -19,6 +11,23 @@ arch:
   - armhf
   - armv7
   - i386
+
+host_network: true
+startup: application
+boot: auto
+init: false
+
+map:
+  - type: share
+    read_only: false
+  - type: ssl
+    read_only: true
+
+privileged:
+  - NET_ADMIN
+
+devices:
+  - /dev/net/tun
 
 options:
   serverAddr: "your-vps.example.com"

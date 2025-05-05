@@ -1,0 +1,28 @@
+configuration:
+  serverAddr:
+    name: Server address
+    description: FQDN or IP of your FRP server
+  serverPort:
+    name: Server port
+    description: Port on which FRP server listens
+  authMethod:
+    name: Authentication method
+    description: Choose between 'token' and 'insecure'
+  authToken:
+    name: Authentication token
+    description: Token for secure authentication
+  tlsEnable:
+    name: Enable TLS
+    description: Whether to use TLS for connection
+  tlsCertFile:
+    name: TLS certificate file
+    description: Path to fullchain.pem on SSL mount
+  tlsKeyFile:
+    name: TLS key file
+    description: Path to privkey.pem on SSL mount
+  tlsCaFile:
+    name: TLS CA file
+    description: Path to trusted CA file on SSL mount
+  proxies:
+    name: Proxies
+    description: Proxy definitions (only first proxy used)
