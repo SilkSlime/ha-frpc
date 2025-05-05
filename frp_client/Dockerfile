@@ -4,7 +4,7 @@ FROM $BUILD_FROM
 ARG BUILD_ARCH
 ARG FRP_VERSION
 
-# Устанавливаем зависимости: bashio, jq и curl
+# Устанавливаем утилиты
 RUN apk add --no-cache bash jq curl
 
 COPY bootstrap.sh /

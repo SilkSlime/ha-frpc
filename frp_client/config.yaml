@@ -1,5 +1,5 @@
 name: "FRP Client"
-version: "0.2.7"
+version: "0.2.8"
 slug: "frp_client"
 description: "Reverse-proxy FRP client for Home Assistant using frpc"
 startup: services
@@ -21,9 +21,9 @@ arch:
   - i386
 
 options:
-  serverAddr: "11.22.33.44"
+  serverAddr: "your-vps.example.com"
   serverPort: 7000
-  authMethod: "token"
+  authMethod: "token"        # or "insecure"
   authToken: "secret-token"
   tlsEnable: true
   tlsCertFile: "/ssl/fullchain.pem"
@@ -36,7 +36,7 @@ options:
       localPort: 8123
       remotePort: 8123
       customDomains:
-        - "home.example.com"
+        - "home.silkslime.ru"
       useEncryption: true
       useCompression: true
 

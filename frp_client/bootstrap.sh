@@ -23,7 +23,7 @@ install() {
   mkdir -p "$work" "$app_path"
   curl -sSL "$url" -o "/tmp/$file"
   tar -xzf "/tmp/$file" -C /tmp
-  cp "/tmp/frp_${frp_version}_linux_${machine}/frpc" "$app_path/"
+  cp "/tmp/frp_${frp_version}_${machine}/frpc" "$app_path/"
   chmod +x "$app_path/frpc"
   rm -rf "/tmp/$file" "$work"
 }
