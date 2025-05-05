@@ -14,7 +14,7 @@ sed -i "s/serverAddr = \"your_server_addr\"/serverAddr = \"$(bashio::config 'ser
 sed -i "s/serverPort = 7000/serverPort = $(bashio::config 'serverPort')/" $CONFIG_PATH
 
 sed -i "s/name = \"your_proxy_name\"/name = \"$(bashio::config 'proxyName')\"/" $CONFIG_PATH
-sed -i "s/type = \"tcp\"/type = \"$(bashio::config 'type')\"/" $CONFIG_PATH
+sed -i "s/type = \"tcp\"/type = \"$(bashio::config 'proxyType')\"/" $CONFIG_PATH
 sed -i "s/localPort = 8123/localPort = $(bashio::config 'localPort')/" $CONFIG_PATH
 sed -i "s/remotePort = 8123/remotePort = $(bashio::config 'remotePort')/" $CONFIG_PATH
 sed -i "s/customDomains = \[\"your_domain\"\]/customDomains = [\"$(bashio::config 'customDomain')\"]/" $CONFIG_PATH
