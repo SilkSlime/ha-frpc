@@ -7,7 +7,10 @@ startup: application
 boot: "auto"
 init: false
 map:
-  - "share:rw"
+  - type: share
+    read_only: false
+  - type: ssl
+    read_only: true
 privileged:
   - NET_ADMIN
 devices:
@@ -21,10 +24,20 @@ arch:
 options:
   serverAddr: "example.com"
   serverPort: 7000
-  customDomain: "example.com"
   proxyName: "homeassistant"
+  proxyType: "tcp"
+  localPort: 8123
+  remotePort: 8123
+  customDomain: "example.com"
+  useEncryption: true
+  useCompression: true
 schema:
   serverAddr: str
   serverPort: int
-  customDomain: str
   proxyName: str
+  proxyType: str
+  localPort: port
+  remotePort: port
+  customDomain: str
+  useEncryption: bool
+  useCompression: bool

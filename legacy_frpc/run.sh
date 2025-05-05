@@ -12,8 +12,14 @@ bashio::log.info "Copying configuration."
 cp $DEFAULT_CONFIG_PATH $CONFIG_PATH
 sed -i "s/serverAddr = \"your_server_addr\"/serverAddr = \"$(bashio::config 'serverAddr')\"/" $CONFIG_PATH
 sed -i "s/serverPort = 7000/serverPort = $(bashio::config 'serverPort')/" $CONFIG_PATH
-sed -i "s/customDomains = \[\"your_domain\"\]/customDomains = [\"$(bashio::config 'customDomain')\"]/" $CONFIG_PATH
+
 sed -i "s/name = \"your_proxy_name\"/name = \"$(bashio::config 'proxyName')\"/" $CONFIG_PATH
+sed -i "s/type = \"tcp\"/type = \"$(bashio::config 'type')\"/" $CONFIG_PATH
+sed -i "s/localPort = 8123/localPort = $(bashio::config 'localPort')/" $CONFIG_PATH
+sed -i "s/remotePort = 8123/remotePort = $(bashio::config 'remotePort')/" $CONFIG_PATH
+sed -i "s/customDomains = \[\"your_domain\"\]/customDomains = [\"$(bashio::config 'customDomain')\"]/" $CONFIG_PATH
+sed -i "s/transport.useEncryption = true/transport.useEncryption = $(bashio::config 'useEncryption')/" $CONFIG_PATH
+sed -i "s/transport.useCompression = true/transport.useCompression = $(bashio::config 'useCompression')/" $CONFIG_PATH
 
 
 bashio::log.info "Starting frp client"
