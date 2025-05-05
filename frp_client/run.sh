@@ -4,32 +4,31 @@ set -e
 CONFIG_PATH="/share/frpc.toml"
 OPTIONS_PATH="/data/options.json"
 
+# Убедимся, что папка /share существует
 mkdir -p "$(dirname "$CONFIG_PATH")"
 
-bashio::log.info "▶ Checking if options file exists…"
-[ -f "$OPTIONS_PATH" ] || { bashio::log.error "Options not found"; exit 1; }
+bashio::log.info "▶ Checking for options file…"
+if [ ! -f "$OPTIONS_PATH" ]; then
+  bashio::log.error "Options file not found at $OPTIONS_PATH"
+  exit 1
+fi
 
-bashio::log.info "▶ Dumping options.json:"
+bashio::log.info "▶ Dump /data/options.json:"
 cat "$OPTIONS_PATH"
 
-# — Правильное чтение в переменные (без пробелов вокруг =)
-SERVER_ADDR=$(bashio::config 'serverAddr')
-SERVER_PORT=$(bashio::config 'serverPort')
-AUTH_METHOD=$(bashio::config 'authMethod')
-AUTH_TOKEN=$(bashio::config 'authToken')
-TLS_ENABLE=$(bashio::config 'tlsEnable')
-TLS_CERT=$(bashio::config 'tlsCertFile')
-TLS_KEY=$(bashio::config 'tlsKeyFile')
-TLS_CA=$(bashio::config 'tlsCaFile')
+# --- Парсим основные параметры через jq ---
+SERVER_ADDR=$(jq -r '.serverAddr'  "$OPTIONS_PATH")
+SERVER_PORT=$(jq -r '.serverPort'  "$OPTIONS_PATH")
+AUTH_METHOD=$(jq -r '.authMethod'   "$OPTIONS_PATH")
+AUTH_TOKEN=$(jq -r '.authToken'     "$OPTIONS_PATH")
+TLS_ENABLE=$(jq -r 'if .tlsEnable then "true" else "false" end' "$OPTIONS_PATH")
+TLS_CERT=$(jq -r '.tlsCertFile'     "$OPTIONS_PATH")
+TLS_KEY=$(jq -r '.tlsKeyFile'       "$OPTIONS_PATH")
+TLS_CA=$(jq -r '.tlsCaFile'         "$OPTIONS_PATH")
 
-bashio::log.info "▶ Parsed values:"
-bashio::log.info "serverAddr  = $SERVER_ADDR"
-bashio::log.info "serverPort  = $SERVER_PORT"
-bashio::log.info "authMethod  = $AUTH_METHOD"
-bashio::log.info "authToken   = $AUTH_TOKEN"
-bashio::log.info "tlsEnable   = $TLS_ENABLE"
+bashio::log.info "▶ Parsed values: serverAddr=$SERVER_ADDR, serverPort=$SERVER_PORT, authMethod=$AUTH_METHOD, tlsEnable=$TLS_ENABLE"
 
-# — [common]
+# --- Генерируем общую секцию [common] ---
 cat <<EOF >"$CONFIG_PATH"
 [common]
 serverAddr  = "$SERVER_ADDR"
@@ -41,7 +40,7 @@ log.level   = "info"
 log.maxDays = 3
 EOF
 
-# — TLS
+# --- TLS, если включён ---
 if [ "$TLS_ENABLE" = "true" ]; then
   cat <<EOF >>"$CONFIG_PATH"
 tls.enable        = true
@@ -51,18 +50,19 @@ tls.trustedCaFile = "$TLS_CA"
 EOF
 fi
 
-# — proxies
+# --- Добавляем прокси-блоки ---
 bashio::log.info "▶ Appending proxies"
-if jq -e '.proxies | length>0' "$OPTIONS_PATH" >/dev/null 2>&1; then
+if jq -e '.proxies | length > 0' "$OPTIONS_PATH" >/dev/null; then
   jq -c '.proxies[]' "$OPTIONS_PATH" | while read -r proxy; do
-    NAME=$(echo "$proxy" | jq -r '.name')
-    TYPE=$(echo "$proxy" | jq -r '.type')
-    LOCAL_IP=$(echo "$proxy" | jq -r '.localIP')
-    LOCAL_PORT=$(echo "$proxy" | jq -r '.localPort')
-    REMOTE_PORT=$(echo "$proxy" | jq -r '.remotePort')
+    NAME=$( echo "$proxy" | jq -r '.name' )
+    TYPE=$( echo "$proxy" | jq -r '.type' )
+    LOCAL_IP=$( echo "$proxy" | jq -r '.localIP' )
+    LOCAL_PORT=$( echo "$proxy" | jq -r '.localPort' )
+    REMOTE_PORT=$(echo "$proxy" | jq -r '.remotePort' )
+    USE_ENC=$( echo "$proxy" | jq -r '.useEncryption' )
+    USE_COMP=$( echo "$proxy" | jq -r '.useCompression' )
+    # Формируем TOML-массив строк
     DOMAINS=$(echo "$proxy" | jq -r '.customDomains | map("\""+.+"\"") | join(", ")')
-    USE_ENC=$(echo "$proxy" | jq -r '.useEncryption')
-    USE_COMP=$(echo "$proxy" | jq -r '.useCompression')
 
     cat <<EOF >>"$CONFIG_PATH"
 
@@ -81,7 +81,7 @@ else
   bashio::log.warning "⚠️ No proxies configured."
 fi
 
-# — финальный вывод и запуск
+# --- Показываем итоговый конфиг и запускаем ---
 bashio::log.info "▶ Final generated config:"
 cat "$CONFIG_PATH"
 
